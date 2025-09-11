@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CarController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +19,11 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware('auth')->group(function () {
-    //
+    Route::get('/aanbod', [CarController::class, 'create'])->name('aanbod.create');
+    Route::post('/aanbod', [CarController::class, 'store'])->name('aanbod.store');
+
+    Route::get('/mijn-autos', [CarController::class, 'myCars'])->name('car.myCars');
+    Route::delete('/mijn-autos/{car}', [CarController::class, 'destroy'])->name('car.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
