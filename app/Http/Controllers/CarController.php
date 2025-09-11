@@ -67,4 +67,29 @@ class CarController extends Controller
 
         return redirect()->route('car.myCars')->with('success', 'Auto succesvol verwijderd.');
     }
+
+
+public function fetchFromRdw($license_plate)
+{
+    // RDW dataset voor voertuiggegevens
+    $url = "https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=" . strtoupper($license_plate);
+
+    $response = Http::get($url);
+
+    if ($response->successful() && !empty($response->json())) {
+        $data = $response->json()[0]; // eerste resultaat pakken
+        return response()->json([
+            'brand'           => $data['merk'] ?? null,
+            'model'           => $data['handelsbenaming'] ?? null,
+            'color'           => $data['eerste_kleur'] ?? null,
+            'doors'           => $data['aantal_deuren'] ?? null,
+            'production_year' => isset($data['datum_eerste_toelating'])
+                                    ? substr($data['datum_eerste_toelating'], 0, 4)
+                                    : null,
+            'weight'          => $data['massa_ledig_voertuig'] ?? null,
+        ]);
+    }
+
+    return response()->json(['error' => 'Geen data gevonden voor dit kenteken'], 404);
+}
 }

@@ -24,6 +24,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/mijn-autos', [CarController::class, 'myCars'])->name('car.myCars');
     Route::delete('/mijn-autos/{car}', [CarController::class, 'destroy'])->name('car.destroy');
+
+     Route::get('/rdw/{license_plate}', [CarController::class, 'fetchFromRdw'])->name('car.fetchRdw');
 });
 
 require __DIR__ . '/auth.php';
