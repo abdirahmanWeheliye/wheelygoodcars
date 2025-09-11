@@ -23,4 +23,10 @@ class Car extends Model
         'color',
         'image',
     ];
+
+    // in het geval voor een many-to-many relatie
+    public function cars()
+    {
+        return $this->belongsToMany(Car::class);
+    }
 }
