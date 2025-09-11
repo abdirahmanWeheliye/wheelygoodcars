@@ -25,9 +25,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/mijn-autos', [CarController::class, 'myCars'])->name('car.myCars');
     Route::delete('/mijn-autos/{car}', [CarController::class, 'destroy'])->name('car.destroy');
 
-     Route::get('/rdw/{license_plate}', [CarController::class, 'fetchFromRdw'])->name('car.fetchRdw');
+    Route::get('/rdw/{license_plate}', [CarController::class, 'fetchFromRdw'])->name('car.fetchRdw');
 
-       Route::get('/auto/{car}/pdf', [CarController::class, 'generatePdf'])->name('car.pdf');
+    Route::get('/auto/{car}/pdf', [CarController::class, 'generatePdf'])->name('car.pdf');
+
+    Route::get('/admin/tags-overzicht', [TagController::class, 'index'])->name('admin.tags_overview');
 });
 
 require __DIR__ . '/auth.php';
