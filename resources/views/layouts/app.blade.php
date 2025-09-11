@@ -29,6 +29,7 @@
                                 Aanbod plaatsen
                             </a>
                         </li>
+                           <a  class="nav-link text-light" href="{{ route('car.pdf', $car->id) }}" class="btn btn-sm btn-secondary">PDF</a>
                     @endauth
                     </li>
                 </ul>

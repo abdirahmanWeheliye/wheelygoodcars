@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Car;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class CarController extends Controller
 {
@@ -69,27 +71,40 @@ class CarController extends Controller
     }
 
 
-public function fetchFromRdw($license_plate)
-{
-    // RDW dataset voor voertuiggegevens
-    $url = "https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=" . strtoupper($license_plate);
+    public function fetchFromRdw($license_plate)
+    {
+        // RDW dataset voor voertuiggegevens
+        $url = "https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=" . strtoupper($license_plate);
 
-    $response = Http::get($url);
+        $response = Http::get($url);
 
-    if ($response->successful() && !empty($response->json())) {
-        $data = $response->json()[0]; // eerste resultaat pakken
-        return response()->json([
-            'brand'           => $data['merk'] ?? null,
-            'model'           => $data['handelsbenaming'] ?? null,
-            'color'           => $data['eerste_kleur'] ?? null,
-            'doors'           => $data['aantal_deuren'] ?? null,
-            'production_year' => isset($data['datum_eerste_toelating'])
-                                    ? substr($data['datum_eerste_toelating'], 0, 4)
-                                    : null,
-            'weight'          => $data['massa_ledig_voertuig'] ?? null,
-        ]);
+        if ($response->successful() && !empty($response->json())) {
+            $data = $response->json()[0]; // eerste resultaat pakken
+            return response()->json([
+                'brand'           => $data['merk'] ?? null,
+                'model'           => $data['handelsbenaming'] ?? null,
+                'color'           => $data['eerste_kleur'] ?? null,
+                'doors'           => $data['aantal_deuren'] ?? null,
+                'production_year' => isset($data['datum_eerste_toelating'])
+                    ? substr($data['datum_eerste_toelating'], 0, 4)
+                    : null,
+                'weight'          => $data['massa_ledig_voertuig'] ?? null,
+            ]);
+        }
+
+        return response()->json(['error' => 'Geen data gevonden voor dit kenteken'], 404);
     }
 
-    return response()->json(['error' => 'Geen data gevonden voor dit kenteken'], 404);
-}
+    public function generatePdf(Car $car)
+    {
+        // Controleer of de ingelogde gebruiker eigenaar is
+        if ($car->user_id !== auth()->id()) {
+            abort(403, 'Je mag deze auto niet bekijken.');
+        }
+
+        $pdf = Pdf::loadView('car.pdf', compact('car'));
+
+        // Download de PDF
+        return $pdf->download('auto_' . $car->license_plate . '.pdf');
+    }
 }
