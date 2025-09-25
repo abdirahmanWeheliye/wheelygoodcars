@@ -107,4 +107,44 @@ class CarController extends Controller
         // Download de PDF
         return $pdf->download('auto_' . $car->license_plate . '.pdf');
     }
+
+    public function updatePrice(Request $request, Car $car)
+    {
+        if ($car->user_id !== auth()->id()) {
+            abort(403, 'Je mag dit aanbod niet aanpassen.');
+        }
+
+        $request->validate([
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $car->price = $request->price;
+        $car->save();
+
+        return back()->with('success', 'Prijs bijgewerkt!');
+    }
+
+    public function toggleStatus(Car $car)
+    {
+        if ($car->user_id !== auth()->id()) {
+            abort(403, 'Je mag dit aanbod niet aanpassen.');
+        }
+
+        $car->sold_at = $car->sold_at ? null : now();
+        $car->save();
+
+        return response()->json([
+            'status' => $car->sold_at ? 'Verkocht' : 'Beschikbaar'
+        ]);
+    }
+
+    public function publicIndex()
+{
+   
+    $cars = Car::whereNull('sold_at')
+               ->orderBy('created_at', 'desc')
+               ->get();
+
+    return view('car.publicIndex', compact('cars'));
+}
 }

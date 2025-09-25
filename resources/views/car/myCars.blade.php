@@ -35,7 +35,7 @@
                             <td>{{ $car->color ?? '-' }}</td>
                             <td>{{ $car->views }}</td>
                             <td>
-                                <a href="#" class="btn btn-sm btn-primary">Bewerk</a>
+                                <a href="{{route('car.updatePrice', $car->id)}}" class="btn btn-sm btn-primary">Bewerk</a>
                                 <form action="{{ route('car.destroy', $car->id) }}" method="POST"
                                     style="display:inline-block;">
                                     @csrf
