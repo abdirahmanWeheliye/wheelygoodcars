@@ -45,8 +45,12 @@
                                         Verwijder
                                     </button>
                             </td>
+                            <td>
+                                <a href="{{ route('car.pdf', $car->id) }}" class="btn btn-sm btn-secondary">PDF</a>
+                            </td>
                         </tr>
                     @endforeach
+
                 </tbody>
             </table>
         @endif

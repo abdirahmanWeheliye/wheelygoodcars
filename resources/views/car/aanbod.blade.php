@@ -4,7 +4,7 @@
     <div class="container mt-4">
         <h2>Auto aanbieden</h2>
 
-        <form method="POST" action="{{ route('aanbod.store') }}">
+        <form method="POST" action="{{ route('aanbod.store') }}" enctype="multipart/form-data">
             @csrf
 
             <div class="mb-3">
@@ -50,6 +50,11 @@
             <div class="mb-3">
                 <label for="mileage" class="form-label">Kilometerstand</label>
                 <input type="number" class="form-control" id="mileage" name="mileage" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Upload een foto!</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
             </div>
 
             <button type="submit" class="btn btn-success">Opslaan</button>
