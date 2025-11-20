@@ -22,7 +22,7 @@ Route::get('/', function () {
 
 
 Route::middleware('auth')->group(function () {
-    Route::get('/aanbod', [CarController::class, 'create'])->name('aanbod.create');
+    Route::get('/aanbod/plaatsen', [CarController::class, 'create'])->name('aanbod.create');
     Route::post('/aanbod', [CarController::class, 'store'])->name('aanbod.store');
 
     Route::get('/mijn-autos', [CarController::class, 'myCars'])->name('car.myCars');
