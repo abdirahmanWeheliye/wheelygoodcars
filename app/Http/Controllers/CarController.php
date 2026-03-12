@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Models\Car;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -27,7 +28,7 @@ class CarController extends Controller
             'production_year' => 'nullable|integer|min:1900|max:' . date('Y'),
             'weight'          => 'nullable|integer|min:0',
             'color'           => 'nullable|string|max:30',
-            'image'           => 'nullable|string|max:255',
+            'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $car = Car::create([
@@ -42,8 +43,15 @@ class CarController extends Controller
             'production_year' => $request->production_year,
             'weight'          => $request->weight,
             'color'           => $request->color,
-            'image'           => $request->image,
         ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('public/cars', $filename);
+            $car->image = $filename;
+            $car->save();
+        }
 
         return view('car.overzicht', [
             'car' => $car
@@ -73,13 +81,18 @@ class CarController extends Controller
 
     public function fetchFromRdw($license_plate)
     {
-        // RDW dataset voor voertuiggegevens
-        $url = "https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=" . strtoupper($license_plate);
+        // Normalize plate
+        $cleanPlate = strtoupper(str_replace(['-', ' '], '', $license_plate));
+
+        // RDW dataset
+        $url = "https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=" . $cleanPlate;
 
         $response = Http::get($url);
 
+        // If RDW returned data
         if ($response->successful() && !empty($response->json())) {
-            $data = $response->json()[0]; // eerste resultaat pakken
+            $data = $response->json()[0];
+
             return response()->json([
                 'brand'           => $data['merk'] ?? null,
                 'model'           => $data['handelsbenaming'] ?? null,
@@ -92,8 +105,23 @@ class CarController extends Controller
             ]);
         }
 
+        // 🔥 FALLBACK: Try your own database
+        $car = Car::where('license_plate', $license_plate)->first();
+
+        if ($car) {
+            return response()->json([
+                'brand'           => $car->brand,
+                'model'           => $car->model,
+                'color'           => $car->color,
+                'doors'           => $car->doors,
+                'production_year' => $car->production_year,
+                'weight'          => $car->weight,
+            ]);
+        }
+
+        // If neither RDW nor DB has data
         return response()->json(['error' => 'Geen data gevonden voor dit kenteken'], 404);
-    }
+    }   
 
     public function generatePdf(Car $car)
     {
@@ -107,6 +135,12 @@ class CarController extends Controller
         // Download de PDF
         return $pdf->download('auto_' . $car->license_plate . '.pdf');
     }
+
+    public function editPrice(Car $car)
+    {
+        return view('car\updatePrice', compact('car'));
+    }
+
 
     public function updatePrice(Request $request, Car $car)
     {
@@ -139,12 +173,12 @@ class CarController extends Controller
     }
 
     public function publicIndex()
-{
-   
-    $cars = Car::whereNull('sold_at')
-               ->orderBy('created_at', 'desc')
-               ->get();
+    {
 
-    return view('car.publicIndex', compact('cars'));
-}
+        $cars = Car::whereNull('sold_at')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('car.publicIndex', compact('cars'));
+    }
 }

@@ -13,9 +13,8 @@ class Tag extends Model
         'name',
     ];
 
-    // in het geval voor een many-to-many relatie
-    public function tags()
+    public function cars()
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Car::class);
     }
 }

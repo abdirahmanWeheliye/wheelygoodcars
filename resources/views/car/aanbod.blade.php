@@ -4,7 +4,7 @@
     <div class="container mt-4">
         <h2>Auto aanbieden</h2>
 
-        <form method="POST" action="{{ route('aanbod.store') }}" enctype="multipart/form-data">
+        <form id="carForm" method="POST" action="{{ route('aanbod.store') }}" enctype="multipart/form-data">
             @csrf
 
             <div class="mb-3">
@@ -44,7 +44,7 @@
 
             <div class="mb-3">
                 <label for="price" class="form-label">Prijs (€)</label>
-                <input type="number" class="form-control" id="price" name="price" required>
+                <input type="number" step="0.01" class="form-control" id="price" name="price" required>
             </div>
 
             <div class="mb-3">
@@ -57,19 +57,32 @@
                 <input type="file" class="form-control" id="image" name="image" accept="image/*">
             </div>
 
-            <button type="submit" class="btn btn-success">Opslaan</button>
+            <div class="d-flex gap-2">
+
+                <button id="rdwBtn" type="button" class="btn btn-secondary">Haal gegevens op</button>
+
+            </div>
         </form>
     </div>
 
     <script>
-        document.getElementById('license_plate').addEventListener('blur', function() {
-            const kenteken = this.value.trim();
-            if (kenteken.length === 0) return;
+        const rdwUrl = "{{ url('/rdw') }}";
 
-            fetch('/rdw/' + kenteken)
+        document.getElementById('rdwBtn').addEventListener('click', function() {
+            const kenteken = document.getElementById('license_plate').value.trim();
+
+            if (kenteken.length === 0) {
+                alert("Vul eerst een kenteken in.");
+                return;
+            }
+
+            fetch("{{ url('/rdw') }}/" + kenteken)
                 .then(res => res.json())
                 .then(data => {
                     if (!data.error) {
+
+                        alert("RDW-gegevens succesvol opgehaald!");
+
                         document.getElementById('brand').value = data.brand || '';
                         document.getElementById('model').value = data.model || '';
                         document.getElementById('color').value = data.color || '';
@@ -77,10 +90,16 @@
                         document.getElementById('doors').value = data.doors || '';
                         document.getElementById('weight').value = data.weight || '';
                     } else {
-                        alert(data.error);
+                        alert("RDW fout: " + data.error);
                     }
                 })
-                .catch(err => console.error(err));
+                .catch(err => {
+                    console.error(err);
+                    alert("Technische fout bij RDW-opvraag.");
+                });
         });
+
+        let kenteken = document.getElementById('license_plate').value.trim();
+        kenteken = kenteken.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
     </script>
 @endsection

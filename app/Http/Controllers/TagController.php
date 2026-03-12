@@ -17,11 +17,11 @@ class TagController extends Controller
                 $query->whereNull('sold_at');
             },
         ])->get();
-        
+
         $tags = $tags->sortByDesc(function ($tag) {
             return $tag->unsold_count + $tag->sold_count;
         });
 
-        return view('admin.tags_overview', compact('tags'));
+            return view('admin.tags_overzicht', compact('tags'));
     }
 }

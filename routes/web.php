@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/admin/tags_overzicht', [TagController::class, 'index'])->name('tags.overzicht');
+
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -30,10 +33,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/rdw/{license_plate}', [CarController::class, 'fetchFromRdw'])->name('car.fetchRdw');
 
+
+
     Route::get('/auto/{car}/pdf', [CarController::class, 'generatePdf'])->name('car.pdf');
 
-    Route::get('/admin/tags-overzicht', [TagController::class, 'index'])->name('admin.tags_overview');
+    Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
 
+    Route::get('/cars/{car}/update-price', [CarController::class, 'editPrice'])->name('car.editPrice');
     Route::post('/cars/{car}/update-price', [CarController::class, 'updatePrice'])->name('car.updatePrice');
     Route::post('/cars/{car}/toggle-status', [CarController::class, 'toggleStatus'])->name('car.toggleStatus');
 });

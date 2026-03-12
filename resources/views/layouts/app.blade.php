@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>WheelyGoodCars</title>
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
 </head>
 
 <body>
@@ -30,8 +31,13 @@
                             <a class="nav-link text-light" href="{{ route('aanbod.create') }}">
                                 Aanbod plaatsen
                             </a>
+                        </li>
 
-                        @endauth
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('tags.overzicht') }}">Tags overzicht</a>
+                        </li>
+
+                    @endauth
 
                 </ul>
                 <ul class="navbar-nav">
