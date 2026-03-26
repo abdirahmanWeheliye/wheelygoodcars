@@ -121,7 +121,15 @@ class CarController extends Controller
 
         // If neither RDW nor DB has data
         return response()->json(['error' => 'Geen data gevonden voor dit kenteken'], 404);
-    }   
+    }
+
+    public function show(Car $car)
+    {
+        // Optioneel: views verhogen
+        $car->increment('views');
+
+        return view('car.show', compact('car'));
+    }
 
     public function generatePdf(Car $car)
     {

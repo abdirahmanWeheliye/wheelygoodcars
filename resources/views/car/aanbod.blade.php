@@ -60,6 +60,7 @@
             <div class="d-flex gap-2">
 
                 <button id="rdwBtn" type="button" class="btn btn-secondary">Haal gegevens op</button>
+                <button type="submit" class="btn btn-primary">Auto aanbieden</button>
 
             </div>
         </form>
