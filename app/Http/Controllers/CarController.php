@@ -131,6 +131,26 @@ class CarController extends Controller
         return view('car.show', compact('car'));
     }
 
+    public function search(Request $request)
+    {
+        $query = strtolower(trim($request->get('q')));
+
+        $words = explode(' ', $query); // split op spaties
+
+        $cars = Car::whereNull('sold_at')
+            ->where(function ($q) use ($words) {
+                foreach ($words as $word) {
+                    $q->where(function ($sub) use ($word) {
+                        $sub->whereRaw('LOWER(brand) LIKE ?', ["%{$word}%"])
+                            ->orWhereRaw('LOWER(model) LIKE ?', ["%{$word}%"]);
+                    });
+                }
+            })
+            ->get();
+
+        return view('car.partials.results', compact('cars'))->render();
+    }
+
     public function generatePdf(Car $car)
     {
         // Controleer of de ingelogde gebruiker eigenaar is

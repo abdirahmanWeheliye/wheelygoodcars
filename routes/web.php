@@ -45,5 +45,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/aanbod', [CarController::class, 'publicIndex'])->name('car.publicIndex');
+Route::get('/cars/search', [CarController::class, 'search'])->name('car.search');
 Route::get('/cars/{car}', [CarController::class, 'show'])->name('car.show');
+
 require __DIR__ . '/auth.php';

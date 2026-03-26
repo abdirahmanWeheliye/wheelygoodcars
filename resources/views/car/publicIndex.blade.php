@@ -1,34 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h2>Alle beschikbare auto's</h2>
+    <div class="container mt-4">
+        <h2>Aanbod</h2>
 
-        @if ($cars->isEmpty())
-            <p>Er zijn momenteel geen beschikbare auto's.</p>
-        @else
-            <div class="row">
-                @foreach ($cars as $car)
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 shadow-sm">
-                            @if ($car->image)
-                                <img src="{{ asset('storage/' . $car->image) }}" class="card-img-top"
-                                    alt="{{ $car->brand }}">
-                            @endif
-                            <div class="card-body">
-                                <a href="{{ route('car.show', $car->id) }}">
-                                    {{ $car->brand }} {{ $car->model }}
-                                </a>
-                                <p class="card-text">
-                                    Kenteken: {{ $car->license_plate }} <br>
-                                    Prijs: €{{ number_format($car->price, 2, ',', '.') }} <br>
-                                    Kilometerstand: {{ number_format($car->mileage) }} km
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
+        <input type="text" id="search" class="form-control mb-3" placeholder="Zoek op merk of model...">
+
+        <div id="results">
+            @include('car.partials.results', ['cars' => $cars])
+        </div>
     </div>
+
+    <script>
+        document.getElementById('search').addEventListener('keyup', function() {
+            let query = this.value;
+
+            fetch("{{ route('car.search') }}?q=" + query)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('results').innerHTML = html;
+                });
+        });
+    </script>
 @endsection
